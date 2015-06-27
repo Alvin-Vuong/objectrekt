@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define MAX_TURN_ANGLE 360
 
 
     // Function to figure out how much to turn by
