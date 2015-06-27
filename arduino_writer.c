@@ -52,16 +52,16 @@ int main()
         angle = getTurnAngle();
     
         if (serialport_init("COM4", 9600))
-            write(2, "Error initializing the serial port", 30);
+            fprintf(stderr, "Error initializing the serial port");
         else
         {
             int serial_fd;
             if ((serial_fd = open("/dev/USB4", O_WRONLY)))
-                write("Error finding file descriptor", 30);
+                fprintf("Error finding file descriptor");
             else
             {
                 if (serialport_write(serial_fd, "%d", angle))
-                    error("Error writing to serial port", 30);
+                    fprintf("Error writing to serial port");
             }
             close(serial_fd);
         }
