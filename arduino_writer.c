@@ -1,14 +1,19 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define MAX_TURN_ANGLE 180
-#define MIN_TURN_ANGLE 0
+#define MAX_ANGLE 180
+#define MIN_ANGLE 0
 
 
     // Function to figure out how much to turn by
 
 
-getTurnAngle()
+int getXAngle()
+{
+    return 45;
+}
+
+int getYAngle()
 {
     // here we will use the date from the Lepton to determine how much we need to turn
 
@@ -24,21 +29,34 @@ getTurnAngle()
 
 int main() 
 {
-    int center = 90;
+    int xCenter = 90;
+    int yCenter = 90;
     while (1) 
     {
-        int angle = center;
+        int xAngle = xCenter;
+        int yAngle = yCenter;
    
-        angle = getTurnAngle();     // find out how much we need to turn the servo and set angle to this
+        yAngle = getYAngle();     // find out how much we need to turn the servo and set angle to this
+        xAngle = getXAngle();
         
-        if (angle != center)
+        FILE *file;
+        
+        if (xAngle != xCenter && xAngle <= MAX_ANGLE && xAngle >= MIN_ANGLE)
         {
-            FILE *file;
             file = fopen("/dev/ttyUSB4", "w");      // "/dev/ttyUSB0" is just where the port is, will probably be different for us
 
-            fprintf(file, "%d", angle);       // write the amount to turn to the "file" (actually arduino)
+            fprintf(file, "%d", xAngle);       // write the amount to turn to the "file" (actually arduino)
 
             fclose(file);       // close connection to arduino
+        }
+        
+        if (yAngle != yCenter && yAngle <= MAX_ANGLE && yAngle >= MIN_ANGLE)
+        {
+            file = fopen("/dev/ttyUSB4", "w");
+            
+            fprintf(file, "%d", yAngle);
+            
+            fclose(file);
         }
     }
 }
