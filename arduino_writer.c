@@ -4,6 +4,8 @@
 #define MAX_ANGLE 180
 #define MIN_ANGLE 0
 
+#define ARRAY_LENGTH
+
 
     // Function to figure out how much to turn by
 
@@ -21,11 +23,23 @@ int getYAngle()
     return 45;
 }
 
+int findAverage(int arr[])
+{
+    int total;
+    int j = 0;
+    
+    for (j; j < ARRAY_LENGTH; j++)
+    {
+        total += arr[j];
+    }
+    
+    return (total/ARRAY_LENGTH);
+}
+
 
 
     // Implementation that treats arduino connection as a file
     // may work, may need to be more complex
-    // positive vs. negative angle determines left vs. right
 
 int main() 
 {
@@ -33,30 +47,48 @@ int main()
     int yCenter = 90;
     while (1) 
     {
-        int xAngle = xCenter;
-        int yAngle = yCenter;
-   
-        yAngle = getYAngle();     // find out how much we need to turn the servo and set angle to this
-        xAngle = getXAngle();
+        int xData[ARRAY_LENGTH], yData[ARRAY_LENGTH];
+        int i = 0;
+        
+        while (i < ARRAY_LENGTH)
+        {
+            int xAngle = xCenter;
+            int yAngle = yCenter;
+            
+            yAngle = getYAngle();     // find out how much we need to turn the servo and set angle to this
+            xAngle = getXAngle();
+            
+            xData[i] = xAngle;
+            yData[i] = yAngle;
+            
+            delay(1);
+        }
+        
+        int xAverage = findAverage(xData);
+        int yAverage = findAverage(yData);
         
         FILE *file;
         
-        if (xAngle != xCenter && xAngle <= MAX_ANGLE && xAngle >= MIN_ANGLE)
+        if (xAngle != xCenter && xAverage <= MAX_ANGLE && xAverage >= MIN_ANGLE)
         {
-            file = fopen("/dev/ttyUSB4", "w");      // "/dev/ttyUSB0" is just where the port is, will probably be different for us
+            file = fopen("USB\VID_234&PID_0043\55330333930351718130", "w");      // "/dev/ttyUSB0" is just where the port is, will probably be different for us
 
-            fprintf(file, "%d", xAngle);       // write the amount to turn to the "file" (actually arduino)
+            fprintf(file, "%d", xAverage);       // write the amount to turn to the "file" (actually arduino)
 
             fclose(file);       // close connection to arduino
+            
+            xCenter = xAverage;
         }
         
-        if (yAngle != yCenter && yAngle <= MAX_ANGLE && yAngle >= MIN_ANGLE)
+        if (yAngle != yCenter && yAverage <= MAX_ANGLE && yAverage >= MIN_ANGLE)
         {
-            file = fopen("/dev/ttyUSB4", "w");
+            file = fopen("USB\VID_234&PID_0043\55330333930351718130", "w");
             
-            fprintf(file, "%d", yAngle);
+            fprintf(file, "%d", yAverage;
             
             fclose(file);
+            
+            yCenter = yAverage;
         }
     }
 }
