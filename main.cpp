@@ -22,9 +22,11 @@
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 0;
-int H_MAX = 256;
-int S_MIN = 0;
+
+//MAX: 256
+int H_MIN = 0;//137
+int H_MAX = 256;//147
+int S_MIN = 0; //39
 int S_MAX = 256;
 int V_MIN = 0;
 int V_MAX = 256;
@@ -196,7 +198,7 @@ int main(int argc, char* argv[])
 	//video capture object to acquire webcam feed
 	VideoCapture capture;
 	//open capture object at location zero (default location for webcam)
-	capture.open(0);
+	capture.open(1);
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
