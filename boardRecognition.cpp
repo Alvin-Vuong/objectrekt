@@ -163,7 +163,7 @@ void calculateCoordinates(int &x, int &y, double &x_angle, double &y_angle)
 
 	//find angles
 	x_angle = atan(ARB_WIDTH / ARB_DISTANCE) * 180.0 / 3.14159265;
-	y_angle = atan(ARB_HEIGHT / ARB_DISTANCE) * 180.0 / 3.14159265;
+	y_angle = atan(ARB_HEIGHT / cameraDistance) * 180.0 / 3.14159265;
 	x_angle += 90;
 	y_angle += 90;
 }
@@ -295,8 +295,11 @@ void detectObject(double &coord1, double &coord2)
 		if (OBJECT_DETECTED)
 		{
 			ofstream file;
+			int result1, result2;
+			result1 = (int) coord1;
+			result2 = (int) coord2;
 			file.open("coordinates.txt");
-			file << setfill('0') << setw(3) << coord1 << setfill('0') << setw(3) << coord2;
+			file << setfill('0') << setw(3) << result1 << setfill('0') << setw(3) << result2;
 			break;
 		}
 
