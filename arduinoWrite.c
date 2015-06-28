@@ -96,12 +96,19 @@ yCenter = yAverage;
 
 int writeToArduino(int x, int y)
 {
-        FILE *file;
-        file = fopen("USB\VID_234&PID_0043\55330333930351718130", "w");      // open the usb port as writeable
+    FILE *file;
+    file = fopen("USB\VID_234&PID_0043\55330333930351718130", "w");      // open the usb port as writeable
 
-        fprintf(file, "%03d%03d", x, y);       // write the amount to turn to the "file" (actually arduino)
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error finding connection");
+        return -1;
+    }
+    
+    fprintf(file, "%03d%03d", x, y);       // write the amount to turn to the "file" (actually arduino)
             
-        fclose(file);       // close connection to arduino
+    fclose(file);       // close connection to arduino
+    return 0;
 }
 
 
