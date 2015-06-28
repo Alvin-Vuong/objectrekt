@@ -66,7 +66,7 @@ const string windowName3 = "After Morphological Operations";
 //const string trackbarWindowName = "Trackbars";
 /*void on_trackbar(int, void*)
 {//This function gets called whenever a
-	// trackbar position is changed
+// trackbar position is changed
 }*/
 
 string intToString(int number)
@@ -77,29 +77,29 @@ string intToString(int number)
 }
 
 /*void createTrackbars(){
-	//create window for trackbars
+//create window for trackbars
 
 
-	namedWindow(trackbarWindowName, 0);
-	//create memory to store trackbar name on window
-	char TrackbarName[50];
-	sprintf(TrackbarName, "H_MIN", H_MIN);
-	sprintf(TrackbarName, "H_MAX", H_MAX);
-	sprintf(TrackbarName, "S_MIN", S_MIN);
-	sprintf(TrackbarName, "S_MAX", S_MAX);
-	sprintf(TrackbarName, "V_MIN", V_MIN);
-	sprintf(TrackbarName, "V_MAX", V_MAX);
-	//create trackbars and insert them into window
-	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
-	//the max value the trackbar can move (eg. H_HIGH), 
-	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
-	//                                  ---->    ---->     ---->      
-	createTrackbar("H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar);
-	createTrackbar("H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar);
-	createTrackbar("S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar);
-	createTrackbar("S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar);
-	createTrackbar("V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar);
-	createTrackbar("V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar);
+namedWindow(trackbarWindowName, 0);
+//create memory to store trackbar name on window
+char TrackbarName[50];
+sprintf(TrackbarName, "H_MIN", H_MIN);
+sprintf(TrackbarName, "H_MAX", H_MAX);
+sprintf(TrackbarName, "S_MIN", S_MIN);
+sprintf(TrackbarName, "S_MAX", S_MAX);
+sprintf(TrackbarName, "V_MIN", V_MIN);
+sprintf(TrackbarName, "V_MAX", V_MAX);
+//create trackbars and insert them into window
+//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
+//the max value the trackbar can move (eg. H_HIGH),
+//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
+//                                  ---->    ---->     ---->
+createTrackbar("H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar);
+createTrackbar("H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar);
+createTrackbar("S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar);
+createTrackbar("S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar);
+createTrackbar("V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar);
+createTrackbar("V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar);
 
 
 }*/
@@ -118,15 +118,15 @@ void drawObject(int x, int y, Mat &frame)
 	if (y - 25>0)
 		line(frame, Point(x, y), Point(x, y - 25), Scalar(0, 255, 0), 2);
 	else line(frame, Point(x, y), Point(x, 0), Scalar(0, 255, 0), 2);
-	
+
 	if (y + 25<FRAME_HEIGHT)
 		line(frame, Point(x, y), Point(x, y + 25), Scalar(0, 255, 0), 2);
 	else line(frame, Point(x, y), Point(x, FRAME_HEIGHT), Scalar(0, 255, 0), 2);
-	
+
 	if (x - 25>0)
 		line(frame, Point(x, y), Point(x - 25, y), Scalar(0, 255, 0), 2);
 	else line(frame, Point(x, y), Point(0, y), Scalar(0, 255, 0), 2);
-	
+
 	if (x + 25<FRAME_WIDTH)
 		line(frame, Point(x, y), Point(x + 25, y), Scalar(0, 255, 0), 2);
 	else line(frame, Point(x, y), Point(FRAME_WIDTH, y), Scalar(0, 255, 0), 2);
@@ -142,7 +142,7 @@ void morphOps(Mat &thresh)
 
 	// erode gets rid of white noise
 	Mat erodeElement = getStructuringElement(MORPH_RECT, Size(3, 3));
-	
+
 	//dilate with larger element so make sure object is nicely visible
 	Mat dilateElement = getStructuringElement(MORPH_RECT, Size(8, 8));
 
@@ -170,7 +170,7 @@ void calculateCoordinates(int &x, int &y, double &x_angle, double &y_angle)
 
 	cout << x_angle << endl;
 	cout << y_angle << endl;
-	
+
 }
 
 void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed, double &coord1, double &coord2)
@@ -258,29 +258,29 @@ void detectObject(double &coord1, double &coord2)
 
 	//open capture object at location zero (default location for webcam)
 	capture.open(0);
-	
+
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
-	
+
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
 	while (1){ //only detect once?
 		//store image to matrix
 		capture.read(cameraFeed);
-	
+
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
-	
+
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-	
+
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
 			morphOps(threshold);
-	
+
 		//pass in thresholded frame to our object tracking function
 		//this function will return the x and y coordinates of the
 		//filtered object
@@ -305,7 +305,7 @@ void detectObject(double &coord1, double &coord2)
 			if (userResponse == "done")
 				break;
 		}
-	
+
 	}
 
 }
@@ -313,9 +313,9 @@ void detectObject(double &coord1, double &coord2)
 /*
 int main()
 {
-	double a, b;
-	detectObject(a, b);
-	cout << a << endl;
-	cout << b << endl;
+double a, b;
+detectObject(a, b);
+cout << a << endl;
+cout << b << endl;
 }
 */
