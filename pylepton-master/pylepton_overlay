@@ -13,8 +13,6 @@ VERTICAL_PIN = 4
 MIN_PULSEWIDTH = 600
 MAX_PULSEWIDTH = 2400
 
-currentx = 90
-currenty = 90
 
 
 def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
@@ -23,6 +21,9 @@ def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
   # the array must be of the form (height, width, color)
   a = np.zeros((240, 320, 3), dtype=np.uint8)
   lepton_buf = np.zeros((60, 80, 1), dtype=np.uint16)
+  
+  currentx = 90
+  currenty = 90
   
   #printDone = 0
   #f = open('data.txt','w')
@@ -54,30 +55,32 @@ def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
           np.right_shift(lepton_buf, 8, lepton_buf)
           a[:lepton_buf.shape[0], :lepton_buf.shape[1], :] = lepton_buf
           o.update(np.getbuffer(a)) # this line adds lepton heat image onto camera image
-	"""  
-	# Print out lepton_buf into a .csv file to view values
-	  if (printDone == 0):
-	    j = 0
-	    k = 0
-	    while j < 60:
-	      while k < 80:
-	    	f.write(str(lepton_buf[j][k]) + '\t')
-	 	k+=1
-	      j+=1
-	      f.write('\n')
-	      k=0
-	    printDone = 1
-	    f.close()
-	"""  
-	  upper = 0
+	  """  
+	  # Print out lepton_buf into a .csv file to view values
+	    if (printDone == 0):
+	      j = 0
+	      k = 0
+	      while j < 60:
+	        while k < 80:
+	    	  f.write(str(lepton_buf[j][k]) + '\t')
+	 	  k+=1
+	        j+=1
+	        f.write('\n')
+	        k=0
+	      printDone = 1
+	      f.close()
+	  """  
+          upper = 0
 	  lower = 0
 	  leftmost = 0
 	  rightmost = 0
           first = False
+          r = 0
+          c = 0
 
 	  while r < 60:
 	    while c < 80:
-	      if (lepton_buf[r][c] >= 80 AND lepton_buf[r][c] <= 275):
+	      if (lepton_buf[r][c] >= 80 and lepton_buf[r][c] <= 275):
 		if (first == False):
                   upper = r
                   lower = r
@@ -95,22 +98,22 @@ def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
             r += 1
           
           xcenter = (leftmost + rightmost) / 2
-          ycenter = (upper + lower) / 4
+          ycenter = (upper + lower) / 2
 
 	  if (xcenter < 30):
-	    currentx -= 5
-	    if (currentx < 0):
-	      currentx = 0
-	  elif (xcenter > 50):
-	    currentx += 5
+	    currentx += 4
 	    if (currentx > 180):
 	      currentx = 180
+	  elif (xcenter > 50):
+	    currentx -= 4
+	    if (currentx < 0):
+	      currentx = 0
 	  if (ycenter < 22):
-	    currenty -= 2
+	    currenty -= 3
             if (currenty < 0):
               currenty = 0
           elif (ycenter > 38):
-            currenty += 2
+            currenty += 3
             if (currenty > 180):
               currenty = 180
 
