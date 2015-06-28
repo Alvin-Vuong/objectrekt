@@ -14,12 +14,14 @@
 //IN THE SOFTWARE.
 
 #include <cmath>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <opencv\highgui.h>
-#include <opencv\cv.h>
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
+#include <raspicam/raspicam.h>
 
 using namespace cv;
 using namespace std;
@@ -257,20 +259,39 @@ void detectObject(double &coord1, double &coord2)
 	VideoCapture capture;
 
 	//open capture object at location zero (default location for webcam)
-	capture.open(0);
+//	capture.open(0);
 
 	//set height and width of capture frame
-	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
-	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
+//	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
+//	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
 
+	raspicam::RaspiCam camera;
+	if (!camera.open()) 
+		{
+			cerr << "Error opening camera" << endl;
+			return;
+		}
+	sleep(3);
+
+	
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
 	while (1){ //only detect once?
 		//store image to matrix
-		capture.read(cameraFeed);
+//		capture.read(cameraFeed);
+		camera.grab();
+		unsigned char *data = new unsigned char[camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB)];
+		camera.retrieve(data, raspicam::RASPICAM_FORMAT_RGB);
+		std::ofstream outFile("boardPicture.ppm",std::ios::binary);
+		outFile << "P6\n" << camera.getWidth() << " " << camera.getHeight() << " 255\n";
+		outFile.write((char*)data, camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
+
+
+		cameraFeed = imread("boardPicture.ppm", 1);		
 
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+		
 
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
