@@ -68,12 +68,14 @@ const string windowName3 = "After Morphological Operations";
 // trackbar position is changed
 }*/
 
+/*
 string intToString(int number)
 {
 	std::stringstream ss;
 	ss << number;
 	return ss.str();
 }
+*/
 
 /*void createTrackbars(){
 //create window for trackbars
@@ -103,6 +105,7 @@ createTrackbar("V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar);
 
 }*/
 
+/*
 void drawObject(int x, int y, Mat &frame)
 {
 
@@ -133,6 +136,8 @@ void drawObject(int x, int y, Mat &frame)
 	putText(frame, intToString(x) + "," + intToString(y), Point(x, y + 30), 1, 1, Scalar(0, 255, 0), 2);
 
 }
+*/ 
+
 void morphOps(Mat &thresh)
 {
 
@@ -215,7 +220,7 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed, double 
 
 				//draw object location on screen
 				// 320, 240 is the center
-				drawObject(x, y, cameraFeed);
+				// drawObject(x, y, cameraFeed);
 
 				calculateCoordinates(x, y, coord1, coord2);
 				OBJECT_DETECTED = true;
