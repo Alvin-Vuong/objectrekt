@@ -6,6 +6,16 @@ import numpy as np
 import cv2
 import traceback
 from pylepton import Lepton
+import pigpio
+
+HORIZONTAL_PIN = 18
+VERTICAL_PIN = 4
+MIN_PULSEWIDTH = 600
+MAX_PULSEWIDTH = 2400
+
+currentx = 90
+currenty = 90
+
 
 def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
   # Create an array representing a 1280x720 image of
@@ -13,13 +23,19 @@ def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
   # the array must be of the form (height, width, color)
   a = np.zeros((240, 320, 3), dtype=np.uint8)
   lepton_buf = np.zeros((60, 80, 1), dtype=np.uint16)
+  
+  #printDone = 0
+  #f = open('data.txt','w')
+  pi = pigpio.pi()
+  pi.set_servo_pulsewidth(HORIZONTAL_PIN, 1500) #Set to 90 deg
+  pi.set_servo_pulsewidth(VERTICAL_PIN, 1500)
 
   with picamera.PiCamera() as camera:
-    #camera.resolution = (640, 480)
-    #camera.framerate = 24
-    #camera.vflip = flip_v
-    #camera.start_preview()
-    #camera.fullscreen = True
+    camera.resolution = (640, 480)
+    camera.framerate = 24
+    camera.vflip = flip_v
+    camera.start_preview()
+    camera.fullscreen = True
     # Add the overlay directly into layer 3 with transparency;
     # we can omit the size parameter of add_overlay as the
     # size is the same as the camera's resolution
@@ -37,11 +53,81 @@ def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
           cv2.normalize(lepton_buf, lepton_buf, 0, 65535, cv2.NORM_MINMAX)
           np.right_shift(lepton_buf, 8, lepton_buf)
           a[:lepton_buf.shape[0], :lepton_buf.shape[1], :] = lepton_buf
-          o.update(np.getbuffer(a))
+          o.update(np.getbuffer(a)) # this line adds lepton heat image onto camera image
+	"""  
+	# Print out lepton_buf into a .csv file to view values
+	  if (printDone == 0):
+	    j = 0
+	    k = 0
+	    while j < 60:
+	      while k < 80:
+	    	f.write(str(lepton_buf[j][k]) + '\t')
+	 	k+=1
+	      j+=1
+	      f.write('\n')
+	      k=0
+	    printDone = 1
+	    f.close()
+	"""  
+	  upper = 0
+	  lower = 0
+	  leftmost = 0
+	  rightmost = 0
+          first = False
+
+	  while r < 60:
+	    while c < 80:
+	      if (lepton_buf[r][c] >= 80 AND lepton_buf[r][c] <= 275):
+		if (first == False):
+                  upper = r
+                  lower = r
+                  leftmost = c
+                  rightmost = c
+                  first = True
+                else:
+                  if (r > lower):
+                    lower = r
+                  if (c < leftmost):
+                    leftmost = c
+                  if (c > rightmost):
+                    rightmost = c
+              c += 1
+            r += 1
+          
+          xcenter = (leftmost + rightmost) / 2
+          ycenter = (upper + lower) / 4
+
+	  if (xcenter < 30):
+	    currentx -= 5
+	    if (currentx < 0):
+	      currentx = 0
+	  elif (xcenter > 50):
+	    currentx += 5
+	    if (currentx > 180):
+	      currentx = 180
+	  if (ycenter < 22):
+	    currenty -= 2
+            if (currenty < 0):
+              currenty = 0
+          elif (ycenter > 38):
+            currenty += 2
+            if (currenty > 180):
+              currenty = 180
+
+	  xpulse = currentx * 10 + 600
+	  ypulse = currenty * 10 + 600
+	
+	  # ANGLE * 10 + 600 = PULSEWIDTH
+	  # PULSEWIDTH can be between 600 and 2400          
+
+          pi.set_servo_pulsewidth(HORIZONTAL_PIN, xpulse)
+	  pi.set_servo_pulsewidth(VERTICAL_PIN, ypulse)
+
     except Exception:
       traceback.print_exc()
     finally:
       camera.remove_overlay(o)
+      pi.stop()
 
 if __name__ == '__main__':
   from optparse import OptionParser
