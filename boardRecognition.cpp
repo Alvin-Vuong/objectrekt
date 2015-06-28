@@ -14,13 +14,12 @@
 //IN THE SOFTWARE.
 
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <opencv\highgui.h>
 #include <opencv\cv.h>
-
-#include "boardRecognition.h"
 
 using namespace cv;
 using namespace std;
@@ -167,10 +166,6 @@ void calculateCoordinates(int &x, int &y, double &x_angle, double &y_angle)
 	y_angle = atan(ARB_HEIGHT / ARB_DISTANCE) * 180.0 / 3.14159265;
 	x_angle += 90;
 	y_angle += 90;
-
-	cout << x_angle << endl;
-	cout << y_angle << endl;
-
 }
 
 void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed, double &coord1, double &coord2)
@@ -299,23 +294,19 @@ void detectObject(double &coord1, double &coord2)
 
 		if (OBJECT_DETECTED)
 		{
-
-			string userResponse;
-			cin >> userResponse;
-			if (userResponse == "done")
-				break;
+			ofstream file;
+			file.open("coordinates.txt");
+			file << coord1 << "\n" << coord2;
+			break;
 		}
 
 	}
 
 }
 
-/*
+
 int main()
 {
-double a, b;
-detectObject(a, b);
-cout << a << endl;
-cout << b << endl;
+	double a, b;
+	detectObject(a, b);
 }
-*/
