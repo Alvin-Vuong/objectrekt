@@ -173,7 +173,7 @@ void calculateCoordinates(int &x, int &y, double &x_angle, double &y_angle)
 	
 }
 
-void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
+void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed, double &coord1, double &coord2)
 {
 
 	Mat temp;
@@ -222,9 +222,7 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 				// 320, 240 is the center
 				drawObject(x, y, cameraFeed);
 
-				double paulsucks = 0;
-				double paulsucksmore = 0;
-				calculateCoordinates(x, y, paulsucks, paulsucksmore);
+				calculateCoordinates(x, y, coord1, coord2);
 				OBJECT_DETECTED = true;
 
 			}
@@ -234,7 +232,7 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 	}
 }
 
-int detectObject()
+void detectObject(double &coord1, double &coord2)
 {
 	//some boolean variables for different functionality within this
 	//program
@@ -287,7 +285,7 @@ int detectObject()
 		//this function will return the x and y coordinates of the
 		//filtered object
 		if (trackObjects)
-			trackFilteredObject(x, y, threshold, cameraFeed);
+			trackFilteredObject(x, y, threshold, cameraFeed, coord1, coord2);
 
 		//show frames 
 		imshow(windowName2, threshold);
@@ -301,6 +299,7 @@ int detectObject()
 
 		if (OBJECT_DETECTED)
 		{
+
 			string userResponse;
 			cin >> userResponse;
 			if (userResponse == "done")
@@ -309,5 +308,14 @@ int detectObject()
 	
 	}
 
-	return 0;
 }
+
+/*
+int main()
+{
+	double a, b;
+	detectObject(a, b);
+	cout << a << endl;
+	cout << b << endl;
+}
+*/
