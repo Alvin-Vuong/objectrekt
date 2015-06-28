@@ -70,50 +70,56 @@ def main(flip_v = False, alpha = 128, device = "/dev/spidev0.0"):
 	      printDone = 1
 	      f.close()
 	  """  
-          upper = 0
-	  lower = 0
-	  leftmost = 0
-	  rightmost = 0
-          first = False
-          r = 0
-          c = 0
+          upper = -1
+	  leftmost = 100
+	  rightmost = -1
+          r = 15
+          c = 39
 
-	  while r < 60:
-	    while c < 80:
+	  while r < 20:
+	    while c >= 0:
 	      if (lepton_buf[r][c] >= 80 and lepton_buf[r][c] <= 275):
-		if (first == False):
-                  upper = r
-                  lower = r
-                  leftmost = c
-                  rightmost = c
-                  first = True
-                else:
-                  if (r > lower):
-                    lower = r
-                  if (c < leftmost):
-                    leftmost = c
-                  if (c > rightmost):
-                    rightmost = c
-              c += 1
+                upper = r
+		if (c < leftmost):
+		  leftmost = c
+              c -= 1
+	    if (leftmost == 100):
+	      c = 40
+	      while c < 80:
+		if (lepton_buf[r][c] >= 80 and lepton_buf[r][c] <= 275):
+	          upper = r
+		  if (c < leftmost):
+		    leftmost = c
+                c += 1
+            if (leftmost != 100):
+	      c = leftmost
+	      rightmost = leftmost
+              while (c < 80):
+	        if (lepton_buf[r][c] >= 80 and lepton_buf[r][c] <= 275):
+		  rightmost = c
+                c += 1
+	    if (upper != -1):
+	      break
+	    c = 0
             r += 1
-          
+         
           xcenter = (leftmost + rightmost) / 2
-          ycenter = (upper + lower) / 2
+          ycenter = upper
 
 	  if (xcenter < 30):
-	    currentx += 4
+	    currentx += 3
 	    if (currentx > 180):
 	      currentx = 180
 	  elif (xcenter > 50):
-	    currentx -= 4
+	    currentx -= 3
 	    if (currentx < 0):
 	      currentx = 0
-	  if (ycenter < 22):
-	    currenty -= 3
+	  if (ycenter < 15):
+	    currenty -= 1
             if (currenty < 0):
               currenty = 0
-          elif (ycenter > 38):
-            currenty += 3
+          elif (ycenter > 20):
+            currenty += 1
             if (currenty > 180):
               currenty = 180
 
