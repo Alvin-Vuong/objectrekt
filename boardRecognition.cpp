@@ -296,7 +296,7 @@ void detectObject(double &coord1, double &coord2)
 		{
 			ofstream file;
 			file.open("coordinates.txt");
-			file << coord1 << "\n" << coord2;
+			file << setfill('0') << setw(3) << coord1 << setfill('0') << setw(3) << coord2;
 			break;
 		}
 
